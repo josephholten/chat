@@ -5,9 +5,6 @@ set(WARNINGS -Wall -Wpedantic -Wextra)
 
 add_subdirectory(docopt.cpp)
 
-add_executable(server server.cpp)
-target_link_libraries(server docopt.cpp)
-target_compile_options(server PUBLIC "${WARNINGS}")
-
-add_executable(client client.cpp)
-target_compile_options(client PUBLIC "${WARNINGS}")
+add_executable(chat chat.cpp)
+target_link_libraries(chat docopt.cpp)
+target_compile_options(chat PUBLIC "${WARNINGS}")
