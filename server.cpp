@@ -8,7 +8,30 @@
 #include <string.h>
 #include <unistd.h>
 
+#include <iostream>
+#include <map>
+
+#include <docopt/docopt.h>
+
+static const char USAGE[] = R"(Usage:
+    chat server [--host=<IP>] [--port=<int>]
+    chat client <SERVER_URL> [--port=<int>]
+Options:
+    -h --help     show this screen
+    --hort=<IP>   host IP to bind to [Default: 0.0.0.0]
+    --port=<int>  select port to connect to [Default: 8080]
+)";
+
 int main(int argc, char** argv){
+    std::map<std::string, docopt::value> args = docopt::docopt(
+        USAGE,
+        { argv + 1, argv + argc }
+    );
+
+    for (auto& arg : args) {
+        std::cout << arg.first << arg.second << std::endl;
+    }
+
     const char* server_node = NULL;
     const char* server_service = "8080";
     const int backlog = 10;
@@ -99,8 +122,8 @@ int main(int argc, char** argv){
         perror("send");
 
     // then receive
-    int recvBufLen = 1024;
-    char* recvBuf[recvBufLen];
+    static const int recvBufLen = 1024;
+    char recvBuf[recvBufLen];
     int recvFlags = 0;
     int bytesReceived = recv(connection_fd, recvBuf, recvBufLen, recvFlags);
     if (bytesReceived < 0)

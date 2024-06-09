@@ -8,7 +8,9 @@
 #include <string.h>
 #include <unistd.h>
 
-int main(int argc, char** argv){
+#include <docopt/docopt.h>
+
+int main(int, char**){
     const char* server_node = "localhost";
     const char* server_service = "8080";
 
@@ -69,8 +71,8 @@ int main(int argc, char** argv){
     }
 
     // as client we first receive
-    int recvBufLen = 1024;
-    char* recvBuf[recvBufLen];
+    static const int recvBufLen = 1024;
+    char recvBuf[recvBufLen];
     int recvFlags = 0;
     if (int bytesReceived = recv(connection_fd, recvBuf, recvBufLen, recvFlags); bytesReceived < 0) {
         perror("recv");
