@@ -28,7 +28,6 @@ int main(int argc, char** argv){
     };
 
     int listen_fd = -1;
-
     for (struct addrinfo* p = server_info; p != NULL; p = p->ai_next) {
         void* addr;
         int port;
@@ -45,25 +44,30 @@ int main(int argc, char** argv){
 
         char ipstr[INET6_ADDRSTRLEN];
         inet_ntop(p->ai_family, addr, ipstr, sizeof ipstr);
-        printf("trying to listen on %s port %d\n", ipstr, port);
 
         listen_fd = socket(p->ai_family, p->ai_socktype, p->ai_protocol);
         if (listen_fd == -1) {
+            fprintf(stderr, "error: trying to open socket for %s :%d\n", ipstr, port);
             perror("socket");
+            listen_fd = -1;
             continue;
         }
 
         if (int res = bind(listen_fd, p->ai_addr, p->ai_addrlen); res == -1) {
+            fprintf(stderr, "error: trying to bind socket to %s :%d\n", ipstr, port);
             perror("bind");
+            listen_fd = -1;
             continue;
         }
 
         if (int res = listen(listen_fd, backlog); res < 0) {
+            fprintf(stderr, "error: trying to listen to socket bound to %s :%d\n", ipstr, port);
             perror("listen");
+            listen_fd = -1;
             continue;
         }
 
-        printf("listen successful\n");
+        printf("listening on socket %d bound to %s port %d\n", listen_fd, ipstr, port);
         break;
     }
     // don't need server_info any more as we are already listening now
@@ -87,27 +91,24 @@ int main(int argc, char** argv){
 
     // as server we first send
     const char *msg = "server obtained connection";
-    int msg_len = strlen(msg);
+    int msgLen = strlen(msg);
     int flags = 0; // this should be fine
-
-    printf("sending msg '%s'\n", msg, msg_len);
-    int bytes_sent = send(connection_fd, msg, msg_len, flags);
-    if (bytes_sent < 0)
+    int bytesSent = send(connection_fd, msg, msgLen, flags);
+    printf("send: {msg: '%s', len: %d, bytesSent: %d}\n", msg, bytesSent, msgLen);
+    if (bytesSent < 0)
         perror("send");
-    else
-        printf("sent %d/%d bytes\n", bytes_sent, msg_len);
 
     // then receive
     int recvBufLen = 1024;
     char* recvBuf[recvBufLen];
     int recvFlags = 0;
-    if (int bytesReceived = recv(connection_fd, recvBuf, recvBufLen, recvFlags); bytesReceived < 0) {
+    int bytesReceived = recv(connection_fd, recvBuf, recvBufLen, recvFlags);
+    if (bytesReceived < 0)
         perror("recv");
-    }
     else if (bytesReceived == 0) {
         printf("recv: connection closed by server\n");
     } else {
-        printf("recv: '%s' (len %d)\n", recvBuf, bytesReceived);
+        printf("recv: {msg: '%s', len %d}\n", recvBuf, bytesReceived);
     }
 
     close(connection_fd);

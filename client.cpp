@@ -43,20 +43,21 @@ int main(int argc, char** argv){
 
         char ipstr[INET6_ADDRSTRLEN];
         inet_ntop(p->ai_family, addr, ipstr, sizeof ipstr);
-        printf("trying to connect to %s port %d\n", ipstr, port);
 
         connection_fd = socket(p->ai_family, p->ai_socktype, p->ai_protocol);
         if (connection_fd == -1) {
+            fprintf(stderr, "error: trying to open socket for %s :%d\n", ipstr, port);
             perror("socket");
             continue;
         }
 
         if (int res = connect(connection_fd, p->ai_addr, p->ai_addrlen); res < 0) {
+            fprintf(stderr, "error: trying to connect to %s :%d\n", ipstr, port);
             perror("connect");
             continue;
         }
 
-        printf("listen successful\n");
+        printf("listening on %s port %d\n", ipstr, port);
         break;
     }
     // don't need server_info any more as we are already listening now
@@ -77,18 +78,17 @@ int main(int argc, char** argv){
     else if (bytesReceived == 0) {
         printf("recv: connection closed by server\n");
     } else {
-        printf("recv: '%s' (len %d)\n", recvBuf, bytesReceived);
+        printf("recv: {msg: '%s', len: %d}\n", recvBuf, bytesReceived);
     }
 
     // then send
     const char *msg = "client connected successfully";
     int msgLen = strlen(msg);
-    printf("send: '%s' (len %d)\n", msg, msgLen);
     int flags = 0; // this should be fine
-    if (int bytes_sent = send(connection_fd, msg, msgLen, flags); bytes_sent < 0)
+    int bytesSent = send(connection_fd, msg, msgLen, flags);
+    printf("send: {msg: '%s', len: %d, bytesSent: %d}\n", msg, bytesSent, msgLen);
+    if (bytesSent < 0)
         perror("send");
-    else
-        printf("sent %d/%d bytes\n", bytes_sent, msgLen);
 
     close(connection_fd);
 
