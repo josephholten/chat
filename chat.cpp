@@ -232,23 +232,21 @@ int main(int argc, char** argv){
         inet_ntop(incoming_addr.ss_family, GetInAddr((struct sockaddr*)&incoming_addr), ipstr, sizeof ipstr);
         printf("accepted connection from %s -> connection_fd %d\n", ipstr, connection_fd);
 
-        // as server we first send then receive
-        SendMessage(connection_fd, "server obtained connection");
-        char* msg;
-        int len = RecvMessage(connection_fd, &msg);
-        (void)len;
-        free(msg); // got to free msg
     } else {
         connection_fd = ClientConnect(args["<SERVER>"].asString().c_str(), (args["--port"] ? args["--port"].asString().c_str() : DEFAULT_PORT));
         if (connection_fd < 0)
             return 1;
-        // as client we first receive then send
-        char* msg;
-        int len = RecvMessage(connection_fd, &msg);
-        (void)len;
-        free(msg); // got to free msg
-        SendMessage(connection_fd, "client connected successfully");
     }
+
+    // what if both server and client first send? -> no problem, we can even send simultaneously!
+    SendMessage(
+        connection_fd,
+        (args["server"].asBool() ? "server obtained connection" : "client connected successfully")
+    );
+    char* msg;
+    int len = RecvMessage(connection_fd, &msg);
+    (void)len;
+    free(msg); // got to free msg
     
     close(connection_fd);
 
