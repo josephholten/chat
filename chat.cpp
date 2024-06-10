@@ -26,6 +26,16 @@ void GetAddrPort(struct addrinfo *p, void **addr, int *port)
     }
 }
 
+// get internet address of sockaddr object for IPv4 or IPv6
+void* GetInAddr(struct sockaddr* sa)
+{
+    if (sa->sa_family == AF_INET) {
+        return &(((struct sockaddr_in*)sa)->sin_addr);
+    } else {
+        return &(((struct sockaddr_in6*)sa)->sin6_addr);
+    }
+}
+
 /* 
  * listen to incoming connection requests 
  * @param node      url or ip 
@@ -78,7 +88,7 @@ int ServerListen(const char* node, const char* service, int backlog) {
             continue;
         }
 
-        printf("listening on socket %d bound to %s port %d\n", listen_fd, ipstr, port);
+        printf("listening on socket %d bound to %s :%d\n", listen_fd, ipstr, port);
         break;
     }
     // don't need server_info any more as we are already listening now
@@ -197,13 +207,8 @@ int main(int argc, char** argv){
         { argv + 1, argv + argc }
     );
 
-    for (auto& v : args) {
-        std::cout << v.first << " " << v.second << std::endl;
-    }
-
     int connection_fd = -1;
     if (args["server"].asBool()) {
-        printf("i am a server\n");
         const int backlog = 10;
 
         int listen_fd = ServerListen(
@@ -215,16 +220,17 @@ int main(int argc, char** argv){
         if (listen_fd < 0)
             return 1;
 
-        // TODO: handle multiple connections here
         struct sockaddr_storage incoming_addr;
         socklen_t incoming_addr_size = sizeof incoming_addr;
-
+        // TODO: handle multiple connections here
         connection_fd = accept(listen_fd, (struct sockaddr *)&incoming_addr, &incoming_addr_size);
         if (connection_fd < 0) {
             perror("accept");
         }
 
-        printf("accepted connection with connection_fd %d\n", connection_fd);
+        char ipstr[INET6_ADDRSTRLEN];
+        inet_ntop(incoming_addr.ss_family, GetInAddr((struct sockaddr*)&incoming_addr), ipstr, sizeof ipstr);
+        printf("accepted connection from %s -> connection_fd %d\n", ipstr, connection_fd);
 
         // as server we first send then receive
         SendMessage(connection_fd, "server obtained connection");
@@ -233,7 +239,6 @@ int main(int argc, char** argv){
         (void)len;
         free(msg); // got to free msg
     } else {
-        printf("i am a client\n");
         connection_fd = ClientConnect(args["<SERVER>"].asString().c_str(), (args["--port"] ? args["--port"].asString().c_str() : DEFAULT_PORT));
         if (connection_fd < 0)
             return 1;
