@@ -7,9 +7,6 @@ set(WARNINGS -Wall -Wpedantic -Wextra -Wno-missing-field-initializers)
 add_subdirectory(docopt.cpp)
 include_directories(docopt.cpp)
 
-add_executable(server server.cpp)
-target_link_libraries(server docopt)
-target_compile_options(server PUBLIC "${WARNINGS}")
-
-add_executable(client client.cpp)
-target_compile_options(client PUBLIC "${WARNINGS}")
+add_executable(chat chat.cpp)
+target_link_libraries(chat docopt)
+target_compile_options(chat PUBLIC "${WARNINGS}")
