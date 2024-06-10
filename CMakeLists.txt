@@ -5,6 +5,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(WARNINGS -Wall -Wpedantic -Wextra -Wno-missing-field-initializers)
 
 add_subdirectory(docopt.cpp)
+include_directories(docopt.cpp)
 
 add_executable(server server.cpp)
 target_link_libraries(server docopt)

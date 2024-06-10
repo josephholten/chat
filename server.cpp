@@ -11,7 +11,7 @@
 #include <iostream>
 #include <map>
 
-#include <docopt/docopt.h>
+#include "docopt.cpp/docopt.h"
 
 static const char USAGE[] = R"(Usage:
     chat server [--host=<IP>] [--port=<int>]

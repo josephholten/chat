@@ -8,8 +8,6 @@
 #include <string.h>
 #include <unistd.h>
 
-#include <docopt/docopt.h>
-
 int main(int, char**){
     const char* server_node = "localhost";
     const char* server_service = "8080";
