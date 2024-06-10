@@ -197,7 +197,7 @@ static const char USAGE[] = R"(Usage:
     chat client <SERVER> [--port=<int>]
 Options:
     -h --help     show this screen
-    --hort=<IP>   host IP to bind to [Default: 0.0.0.0]
+    --host=<IP>   host IP to bind to [Default: 0.0.0.0]
     --port=<int>  select port to connect to [Default: 8080]
 )";
 
