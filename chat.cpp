@@ -161,7 +161,7 @@ int SendMessage(int connection_fd, const char* msg, bool log = true) {
     int flags = 0;
     int bytesSent = send(connection_fd, msg, msgLen, flags);
     if (log)
-        printf("send: {msg: '%s', len: %d, bytesSent: %d}\n", msg, bytesSent, msgLen);
+        printf("send: {msg: '%s', len: %d, bytesSent: %d}\n", msg, msgLen, bytesSent);
     if (bytesSent < 0)
         perror("send");
     // TODO: handle bytesSent < msgLen by sending another packet
