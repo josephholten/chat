@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.27.0)
 project(chat LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 20)
-set(WARNINGS -Wall -Wpedantic -Wextra -Wno-missing-field-initializers)
+set(WARNINGS -Wall -Wpedantic -Wextra -Wno-missing-field-initializers -Werror)
 
 add_subdirectory(docopt.cpp)
 include_directories(docopt.cpp)
