@@ -28,10 +28,6 @@ int main(int argc, char** argv){
         { argv + 1, argv + argc }
     );
 
-    for (auto& arg : args) {
-        std::cout << arg.first << arg.second << std::endl;
-    }
-
     const char* server_node = NULL;
     const char* server_service = "8080";
     const int backlog = 10;
