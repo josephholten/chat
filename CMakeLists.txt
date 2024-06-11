@@ -11,5 +11,5 @@ include_directories(docopt.cpp)
 
 add_executable(chat chat.cpp)
 target_link_libraries(chat docopt)
-target_compile_options(chat PRIVATE "${WARNINGS}" "${SANITIZERS}")
-target_link_options(chat PRIVATE "${SANITIZERS}")
+target_compile_options(chat PRIVATE "$<$<CONFIG:DEBUG>:${WARNINGS}>" "$<$<CONFIG:DEBUG>:${SANITIZERS}>")
+target_link_options(chat PRIVATE "$<$<CONFIG:DEBUG>:${SANITIZERS}>")
