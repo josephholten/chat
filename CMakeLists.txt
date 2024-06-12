@@ -6,8 +6,8 @@ set(WARNINGS -Wall -Wpedantic -Wextra -Wno-missing-field-initializers -Werror)
 set(SANITIZERS -fsanitize=address -fno-omit-frame-pointer)
 #set(SANITIZERS -fsanitize=thread -fno-omit-frame-pointer)
 
-add_subdirectory(docopt.cpp)
-include_directories(docopt.cpp)
+add_subdirectory(docopt)
+include_directories(docopt)
 
 add_executable(chat chat.cpp)
 target_link_libraries(chat docopt)

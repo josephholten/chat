@@ -11,7 +11,7 @@
 #include <iostream>
 #include <map>
 
-#include "docopt.cpp/docopt.h"
+#include "docopt/docopt.h"
 
 void GetAddrPort(struct addrinfo *p, void **addr, int *port)
 {
