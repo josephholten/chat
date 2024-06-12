@@ -7,4 +7,5 @@ services:
   client:
     build: .
     command: client server
+    depends_on: server
     
