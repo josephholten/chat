@@ -19,26 +19,11 @@
 #define DEFAULT_PORT "8080"
 #endif
 
-void SetLogLevel(std::string level) {
-    if (level == "ERROR") {
-        spdlog::set_level(spdlog::level::err);
-    } else if (level == "WARN") {
-        spdlog::set_level(spdlog::level::warn);
-    } else if (level == "INFO") {
-        spdlog::set_level(spdlog::level::info);
-    } else if (level == "DEBUG") {
-        spdlog::set_level(spdlog::level::debug);
-    } else {
-        spdlog::error("unrecognized log level {}", level);
-    }
-}
-
-int SendMessage(int connection_fd, const char* msg) {
-    int msgLen = strlen(msg);
+int SendMessage(int connection_fd, std::string msg) {
     int flags = 0;
-    int bytesSent = send(connection_fd, msg, msgLen, flags);
+    int bytesSent = send(connection_fd, msg.c_str(), msg.size(), flags);
     if (log)
-        spdlog::debug("send: {{msg: '{}', len: {}, bytesSent: {}}}\n", msg, msgLen, bytesSent);
+        spdlog::debug("send: {{msg: '{}', len: {}, bytesSent: {}}}", msg, msg.size(), bytesSent);
     if (bytesSent < 0)
         perror("send");
     // TODO: handle bytesSent < msgLen by sending another packet
@@ -57,9 +42,9 @@ int RecvMessage(int connection_fd, char** msg, int recv_flags = 0) {
     if (bytesReceived < 0)
         perror("recv");
     else if (bytesReceived == 0) {
-        spdlog::info("recv: connection closed by server\n");
+        spdlog::info("recv: connection closed by server");
     }
-    spdlog::debug("recv: {{msg: '{}', len {}}}\n", buf, bytesReceived);
+    spdlog::debug("recv: {{msg: '{}', len {}}}", buf, bytesReceived);
 
     return bytesReceived;
 }

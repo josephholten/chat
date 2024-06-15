@@ -30,7 +30,7 @@ int ServerListen(const char* node, const char* service, int backlog) {
     struct addrinfo* server_info = NULL;
 
     if (int status = getaddrinfo(node, service, &hints, &server_info); status != 0) {
-        fprintf(stderr, "getaddrinfo error: %s\n", gai_strerror(status));
+        spdlog::error("getaddrinfo error: {}", gai_strerror(status));
         return 1;
     };
 
@@ -46,34 +46,34 @@ int ServerListen(const char* node, const char* service, int backlog) {
 
         listen_fd = socket(p->ai_family, p->ai_socktype, p->ai_protocol);
         if (listen_fd == -1) {
-            fprintf(stderr, "error: trying to open socket for %s :%d\n", ipstr, port);
-            perror("socket");
+            spdlog::debug("trying to open socket for {} :{}", ipstr, port);
+            spdlog::debug("socket: {}", strerror(errno));
             listen_fd = -1;
             continue;
         }
 
         if (int res = bind(listen_fd, p->ai_addr, p->ai_addrlen); res == -1) {
-            fprintf(stderr, "error: trying to bind socket to %s :%d\n", ipstr, port);
-            perror("bind");
+            spdlog::debug("trying to bind socket to {} :{}", ipstr, port);
+            spdlog::debug("bind: {}", strerror(errno));
             listen_fd = -1;
             continue;
         }
 
         if (int res = listen(listen_fd, backlog); res < 0) {
-            fprintf(stderr, "error: trying to listen to socket bound to %s :%d\n", ipstr, port);
-            perror("listen");
+            spdlog::debug("trying to listen to socket bound to {} :{}", ipstr, port);
+            spdlog::debug("listen: {}", strerror(errno));
             listen_fd = -1;
             continue;
         }
 
-        printf("listening on socket %d bound to %s :%d\n", listen_fd, ipstr, port);
+        spdlog::info("listening on socket {} bound to {} :{}\n", listen_fd, ipstr, port);
         break;
     }
     // don't need server_info any more as we are already listening now
     freeaddrinfo(server_info);
 
     if (listen_fd == -1)
-        fprintf(stderr, "error: couldn't listen on any ip\n");
+        spdlog::error("error: couldn't listen on any ip");
 
     return listen_fd;
 }
@@ -84,7 +84,7 @@ int AcceptConnection(int listen_fd) {
     // TODO: handle multiple connections here
     int connection_fd = accept(listen_fd, (struct sockaddr *)&incoming_addr, &incoming_addr_size);
     if (connection_fd < 0) {
-        perror("accept");
+        spdlog::error("accept: {}", strerror(errno));
     }
 
     spdlog::info("accepted connection from {} -> connection_fd {}", SockaddrToString(&incoming_addr), connection_fd);
@@ -108,7 +108,7 @@ int ClientConnect(const char* node, const char* service) {
     struct addrinfo* server_info = NULL;
 
     if (int status = getaddrinfo(node, service, &hints, &server_info); status != 0) {
-        fprintf(stderr, "getaddrinfo error: %s\n", gai_strerror(status));
+        spdlog::error("getaddrinfo error: {}", gai_strerror(status));
         return 1;
     };
 
@@ -125,25 +125,25 @@ int ClientConnect(const char* node, const char* service) {
 
         connection_fd = socket(p->ai_family, p->ai_socktype, p->ai_protocol);
         if (connection_fd == -1) {
-            fprintf(stderr, "error: trying to open socket for %s :%d\n", ipstr, port);
-            perror("socket");
+            spdlog::debug("trying to open socket for {} :{}", ipstr, port);
+            spdlog::debug("socket: {}", strerror(errno));
             continue;
         }
 
         if (int res = connect(connection_fd, p->ai_addr, p->ai_addrlen); res < 0) {
-            fprintf(stderr, "error: trying to connect to %s :%d\n", ipstr, port);
-            perror("connect");
+            spdlog::debug("trying to connect to {} :{}", ipstr, port);
+            spdlog::debug("connect: {}", strerror(errno));
             continue;
         }
 
-        printf("connected to on %s port %d\n", ipstr, port);
+        spdlog::info("connected to {} port {}\n", ipstr, port);
         break;
     }
     // don't need server_info any more as we are already listening now
     freeaddrinfo(server_info);
 
     if (connection_fd == -1) {
-        fprintf(stderr, "error: couldn't connect to any ip\n");
+        spdlog::error("couldn't connect to any ip");
         return 1;
     }
 

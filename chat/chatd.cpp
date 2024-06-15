@@ -33,8 +33,8 @@ int main(int argc, char** argv){
         { argv + 1, argv + argc }
     );
 
-    if (args["--level"])
-        SetLogLevel(args["--level"].asString());
+    if (args["--log"])
+        spdlog::set_level(spdlog::level::from_str(args["--log"].asString()));
 
     const int backlog = 10;
 

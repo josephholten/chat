@@ -10,6 +10,7 @@
 
 #include <iostream>
 #include <map>
+#include <format>
 
 #include "docopt/docopt.h"
 #include "tcp.h"
@@ -18,10 +19,10 @@
 static const char USAGE[] = R"(Usage:
     chat <SERVER> [--port=<int>] [--username=<STR>] [--log=LEVEL]
 Options:
-    -h --help          show this screen
-    --port=INT select  port to connect to [Default: 8080]
-    -u --username=NAME set username [Default: anon]
-    --log=LEVEL        set logging level, one of EROR, WARN, INFO, DEBUG
+    -h --help           show this screen
+    --port=INT          select port to connect to [Default: 8080]
+    -u --username=NAME  set username [Default: anon]
+    --log=LEVEL         set logging level, one of error, warn, info, debug
 )";
 
 int main(int argc, char** argv){
@@ -30,8 +31,8 @@ int main(int argc, char** argv){
         { argv + 1, argv + argc }
     );
 
-    if (args["--level"])
-        SetLogLevel(args["--level"].asString());
+    if (args["--log"])
+        spdlog::set_level(spdlog::level::from_str(args["--log"].asString()));
 
     int connection_fd = -1;
     connection_fd = ClientConnect(args["<SERVER>"].asString().c_str(), (args["--port"] ? args["--port"].asString().c_str() : DEFAULT_PORT));
@@ -44,12 +45,9 @@ int main(int argc, char** argv){
     free(msg); // got to free msg
 
     // what if both server and client first send? -> no problem, we can even send simultaneously!
-    char buf[1024];
-    const char* username =  (args["--username"] ? args["--username"].asString().c_str() : "anon");
-    sprintf(buf, "%s connected successfully", username);
     SendMessage(
         connection_fd,
-        buf
+        std::format("{} connected successfully", (args["--username"] ? args["--username"].asString().c_str() : "anon"))
     );
     close(connection_fd);
 
