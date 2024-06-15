@@ -2,3 +2,6 @@
 [submodule "docopt"]
 	path = docopt
 	url = http://github.com/docopt/docopt.cpp
+[submodule "spdlog"]
+	path = spdlog
+	url = https://github.com/gabime/spdlog.git
