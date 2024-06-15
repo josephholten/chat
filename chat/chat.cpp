@@ -16,11 +16,12 @@
 #include "chat.h"
 
 static const char USAGE[] = R"(Usage:
-    chat <SERVER> [--port=<int>] [--username=<STR>]
+    chat <SERVER> [--port=<int>] [--username=<STR>] [--log=LEVEL]
 Options:
-    -h --help            show this screen
-    --port=<int>         select port to connect to [Default: 8080]
-    -u --username=<NAME> set username [Default: anon]
+    -h --help          show this screen
+    --port=INT select  port to connect to [Default: 8080]
+    -u --username=NAME set username [Default: anon]
+    --log=LEVEL        set logging level, one of EROR, WARN, INFO, DEBUG
 )";
 
 int main(int argc, char** argv){
@@ -28,6 +29,9 @@ int main(int argc, char** argv){
         USAGE,
         { argv + 1, argv + argc }
     );
+
+    if (args["--level"])
+        SetLogLevel(args["--level"].asString());
 
     int connection_fd = -1;
     connection_fd = ClientConnect(args["<SERVER>"].asString().c_str(), (args["--port"] ? args["--port"].asString().c_str() : DEFAULT_PORT));

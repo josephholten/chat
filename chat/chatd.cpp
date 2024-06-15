@@ -33,7 +33,8 @@ int main(int argc, char** argv){
         { argv + 1, argv + argc }
     );
 
-    std::vector<pollfd> poll_fds;
+    if (args["--level"])
+        SetLogLevel(args["--level"].asString());
 
     const int backlog = 10;
 

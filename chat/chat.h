@@ -19,7 +19,21 @@
 #define DEFAULT_PORT "8080"
 #endif
 
-int SendMessage(int connection_fd, const char* msg, bool log = true) {
+void SetLogLevel(std::string level) {
+    if (level == "ERROR") {
+        spdlog::set_level(spdlog::level::err);
+    } else if (level == "WARN") {
+        spdlog::set_level(spdlog::level::warn);
+    } else if (level == "INFO") {
+        spdlog::set_level(spdlog::level::info);
+    } else if (level == "DEBUG") {
+        spdlog::set_level(spdlog::level::debug);
+    } else {
+        spdlog::error("unrecognized log level {}", level);
+    }
+}
+
+int SendMessage(int connection_fd, const char* msg) {
     int msgLen = strlen(msg);
     int flags = 0;
     int bytesSent = send(connection_fd, msg, msgLen, flags);
@@ -31,7 +45,7 @@ int SendMessage(int connection_fd, const char* msg, bool log = true) {
     return bytesSent;
 }
 
-int RecvMessage(int connection_fd, char** msg, int recv_flags = 0, bool log = true) {
+int RecvMessage(int connection_fd, char** msg, int recv_flags = 0) {
     static const int bufLen = 2048; // larger than any MTU size
     char buf[bufLen] = {0};
 
