@@ -66,7 +66,7 @@ int ServerListen(const char* node, const char* service, int backlog) {
             continue;
         }
 
-        spdlog::info("listening on socket {} bound to {} :{}\n", listen_fd, ipstr, port);
+        spdlog::info("listening on socket {} bound to {} :{}", listen_fd, ipstr, port);
         break;
     }
     // don't need server_info any more as we are already listening now
@@ -136,7 +136,7 @@ int ClientConnect(const char* node, const char* service) {
             continue;
         }
 
-        spdlog::info("connected to {} port {}\n", ipstr, port);
+        spdlog::info("connected to {} port {}", ipstr, port);
         break;
     }
     // don't need server_info any more as we are already listening now
