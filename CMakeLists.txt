@@ -12,3 +12,5 @@ include_directories(docopt)
 add_subdirectory(spdlog)
 
 add_subdirectory(chat)
+
+add_subdirectory(ncurses_test)
